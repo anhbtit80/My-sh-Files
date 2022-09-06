@@ -1,0 +1,37 @@
+name: VPS
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: update and upgrade
+        run: sudo apt-get update -y && sudo apt-get upgrade -y
+      - name: install ngrok
+        run: |
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
+          
+      - name: Run sshd
+        run: sudo service sshd start
+        
+      - name: Change pass
+        run: yes superpass | sudo passwd
+        
+      - name: add user
+        run: |
+          sudo useradd -m superuser
+          yes superpass | sudo passwd superuser
+          sudo usermod -aG sudo superuser
+
+      - name: Run ngrok
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        run: |
+          ngrok authtoken $NGROK_AUTH_TOKEN
+          ngrok tcp 22 &
+      - name: Get Ngrok
+        run: curl http://localhost:4040/api/tunnels
+
+      - name: run loop
+        run: tail -f /dev/null
