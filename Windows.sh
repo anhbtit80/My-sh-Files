@@ -5,7 +5,6 @@ read -p "Paste authtoken here (Copy and Ctrl+V to paste then press Enter): " CRP
 nohup ./ngrok tcp --region ap 5900 &>/dev/null &
 echo Please wait for installing...
 sudo apt update -y > /dev/null 2>&1
-echo "Installing QEMU (2-3m)..."
 sudo apt install qemu-system-x86 curl -y > /dev/null 2>&1
 echo Downloading Windows Disk...
 curl -L -o lite10.qcow2 https://app.vagrantup.com/thuonghai2711/boxes/WindowsQCOW2/versions/1.1.3/providers/qemu.box
